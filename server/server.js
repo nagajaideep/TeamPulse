@@ -4,7 +4,10 @@ const cors = require('cors');
 const http = require('http');
 const socketIo = require('socket.io');
 const path = require('path');
-require('dotenv').config();
+require('dotenv').config({ path: path.join(__dirname, '.env') });
+console.log("JWT Secret:", process.env.JWT_SECRET);
+console.log("Current working directory:", process.cwd());
+console.log("__dirname:", __dirname);
 
 const app = express();
 const server = http.createServer(app);

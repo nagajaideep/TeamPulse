@@ -160,13 +160,13 @@ const Dashboard = () => {
         {/* Page content */}
         <main className="py-6">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <Routes>
-              <Route path="/" element={<DashboardHome />} />
-              <Route path="/tasks" element={<KanbanBoard />} />
-              <Route path="/calendar" element={<CalendarView />} />
-              <Route path="/feedback" element={<Feedback />} />
-              <Route path="/reports" element={<Reports />} />
-            </Routes>
+                    <Routes>
+          <Route path="/" element={<DashboardHome navigate={navigate} />} />
+          <Route path="/tasks" element={<KanbanBoard />} />
+          <Route path="/calendar" element={<CalendarView />} />
+          <Route path="/feedback" element={<Feedback />} />
+          <Route path="/reports" element={<Reports />} />
+        </Routes>
           </div>
         </main>
       </div>
@@ -175,7 +175,7 @@ const Dashboard = () => {
 };
 
 // Dashboard home component
-const DashboardHome = () => {
+const DashboardHome = ({ navigate }) => {
   const { user } = useAuth();
 
   return (
