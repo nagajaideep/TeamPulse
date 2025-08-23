@@ -21,7 +21,9 @@ npm run install-all
 2. **Set up environment variables:**
 ```bash
 cp env.example .env
-# Edit .env with your MongoDB URI and JWT secret
+# IMPORTANT: open `.env` and replace the MONGO_URI value with your local MongoDB URL
+# for example: `MONGO_URI=mongodb://localhost:27017/team-pulse`
+# Also set `JWT_SECRET` to a secure value
 ```
 
 3. **Seed the database:**
@@ -31,6 +33,12 @@ npm run seed
 
 4. **Start the application:**
 ```bash
+# Start the backend server first (from project root):
+cd server
+node server.js
+
+# In a separate terminal, start the frontend (from project root):
+cd ..
 npm run dev
 ```
 
@@ -231,7 +239,8 @@ TeamPulse/
 
 ### Environment Variables
 ```bash
-MONGO_URI=mongodb://localhost:27017/teampulse
+# Replace MONGO_URI in `server/.env` with your local MongoDB URL, for example:
+MONGO_URI=mongodb://localhost:27017/team-pulse
 JWT_SECRET=your-super-secret-jwt-key
 PORT=5000
 NODE_ENV=production
