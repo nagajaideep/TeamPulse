@@ -18,18 +18,23 @@ cd TeamPulse
 npm run install-all
 ```
 
+
 2. **Set up environment variables:**
 ```bash
-cp env.example .env
-# IMPORTANT: open `.env` and replace the MONGO_URI value with your local MongoDB URL
-# for example: `MONGO_URI=mongodb://localhost:27017/team-pulse`
-# Also set `JWT_SECRET` to a secure value
+# On Linux/macOS
+cp .env_example .env
+
+# On Windows 
+copy .env_example .env
 ```
+Then open the new `.env` file and change the values as needed (see `.env_example` for details).
+
 
 3. **Seed the database:**
 ```bash
 npm run seed
 ```
+
 
 4. **Start the application:**
 ```bash
@@ -41,6 +46,7 @@ node server.js
 cd ..
 npm run dev
 ```
+Alternatively, running npm run dev will start both the backend and frontend servers simultaneously.
 
 The application will be available at:
 - Frontend: http://localhost:3000
