@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { X, Calendar, User, AlertCircle, Clock, CheckCircle, Circle, Edit, Trash2 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import axios from 'axios';
+import { apiCall } from '../../config/apiHelper';
 
 const TaskModal = ({ task, users, onClose, onUpdate }) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -27,7 +27,7 @@ const TaskModal = ({ task, users, onClose, onUpdate }) => {
     setLoading(true);
 
     try {
-      const response = await axios.put(`/api/tasks/${task._id}`, formData);
+      const response = await apiCall.put(`/api/tasks/${task._id}`, formData);
       onUpdate(response.data);
       setIsEditing(false);
       toast.success('Task updated successfully!');
@@ -43,7 +43,7 @@ const TaskModal = ({ task, users, onClose, onUpdate }) => {
 
     setLoading(true);
     try {
-      await axios.delete(`/api/tasks/${task._id}`);
+      await apiCall.delete(`/api/tasks/${task._id}`);
       onClose();
       toast.success('Task deleted successfully!');
     } catch (error) {

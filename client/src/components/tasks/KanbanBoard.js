@@ -3,17 +3,17 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { useSocket } from '../../contexts/SocketContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from 'react-hot-toast';
-import { 
-  Plus, 
-  MoreVertical, 
-  Calendar, 
-  User, 
+import {
+  Plus,
+  MoreVertical,
+  Calendar,
+  User,
   AlertCircle,
   Clock,
   CheckCircle,
   Circle
 } from 'lucide-react';
-import axios from 'axios';
+import { apiCall } from '../../config/apiHelper';
 import TaskModal from './TaskModal';
 import CreateTaskModal from './CreateTaskModal';
 
@@ -54,7 +54,7 @@ const KanbanBoard = () => {
 
   const fetchTasks = async () => {
     try {
-      const response = await axios.get('/api/tasks');
+      const response = await apiCall.get('/api/tasks');
       setTasks(response.data);
     } catch (error) {
       toast.error('Failed to fetch tasks');
@@ -65,7 +65,7 @@ const KanbanBoard = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get('/api/reports/users');
+      const response = await apiCall.get('/api/reports/users');
       setUsers(response.data);
     } catch (error) {
       console.error('Failed to fetch users:', error);
@@ -75,7 +75,7 @@ const KanbanBoard = () => {
   // Filter users based on current user's role for task assignment
   const getAssignableUsers = () => {
     if (!user || users.length === 0) return [];
-    
+
     switch (user.role) {
       case 'student':
         // Students can only assign tasks to fellow students
@@ -130,7 +130,7 @@ const KanbanBoard = () => {
     } else {
       // Move to different column
       try {
-        await axios.put(`/api/tasks/${draggableId}/move`, {
+        await apiCall.put(`/api/tasks/${draggableId}/move`, {
           status: destination.droppableId
         });
       } catch (error) {
@@ -212,9 +212,8 @@ const KanbanBoard = () => {
                   <div
                     ref={provided.innerRef}
                     {...provided.droppableProps}
-                    className={`min-h-[200px] space-y-3 ${
-                      snapshot.isDraggingOver ? 'bg-blue-50 rounded-md' : ''
-                    }`}
+                    className={`min-h-[200px] space-y-3 ${snapshot.isDraggingOver ? 'bg-blue-50 rounded-md' : ''
+                      }`}
                   >
                     {tasks
                       .filter(task => task.status === column.id)
@@ -225,9 +224,8 @@ const KanbanBoard = () => {
                               ref={provided.innerRef}
                               {...provided.draggableProps}
                               {...provided.dragHandleProps}
-                              className={`bg-white p-4 rounded-lg shadow-sm border border-gray-200 cursor-pointer hover:shadow-md transition-shadow ${
-                                snapshot.isDragging ? 'shadow-lg' : ''
-                              }`}
+                              className={`bg-white p-4 rounded-lg shadow-sm border border-gray-200 cursor-pointer hover:shadow-md transition-shadow ${snapshot.isDragging ? 'shadow-lg' : ''
+                                }`}
                               onClick={() => {
                                 setSelectedTask(task);
                                 setShowTaskModal(true);

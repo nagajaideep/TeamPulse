@@ -4,6 +4,9 @@ import { useAuth } from './AuthContext';
 
 const SocketContext = createContext();
 
+// Socket URL configuration
+const SOCKET_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+
 export const useSocket = () => {
   const context = useContext(SocketContext);
   if (!context) {
@@ -19,7 +22,7 @@ export const SocketProvider = ({ children }) => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      const newSocket = io('http://localhost:5001', {
+      const newSocket = io(SOCKET_URL, {
         transports: ['websocket', 'polling']
       });
 

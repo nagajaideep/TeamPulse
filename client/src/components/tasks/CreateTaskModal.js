@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { X } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import axios from 'axios';
+import { apiCall } from '../../config/apiHelper';
 
 const CreateTaskModal = ({ users, onClose, onCreate }) => {
   const [loading, setLoading] = useState(false);
@@ -26,7 +26,7 @@ const CreateTaskModal = ({ users, onClose, onCreate }) => {
     setLoading(true);
 
     try {
-      const response = await axios.post('/api/tasks', formData);
+      const response = await apiCall.post('/api/tasks', formData);
       onCreate(response.data);
       onClose();
       toast.success('Task created successfully!');
