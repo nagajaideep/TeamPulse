@@ -2,6 +2,8 @@ const express = require('express');
 const { body, validationResult } = require('express-validator');
 const Task = require('../models/Task');
 const User = require('../models/User');
+const Meeting = require('../models/Meeting');
+const Feedback = require('../models/Feedback');
 const auth = require('../middleware/auth');
 const multer = require('multer');
 const path = require('path');
@@ -27,6 +29,60 @@ const upload = multer({
 });
 
 const router = express.Router();
+
+// @route   GET /api/tasks/dashboard-stats
+// @desc    Get dashboard statistics for current user
+// @access  Private
+router.get('/dashboard-stats', auth, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    
+    // Get user's active tasks (tasks assigned to them that are not done)
+    const activeTasks = await Task.countDocuments({
+      assignee: userId,
+      status: { $ne: 'Done' }
+    });
+
+    // Get completion rate for user's tasks
+    const totalUserTasks = await Task.countDocuments({ assignee: userId });
+    const completedUserTasks = await Task.countDocuments({ 
+      assignee: userId, 
+      status: 'Done' 
+    });
+    const completionRate = totalUserTasks > 0 ? 
+      Math.round((completedUserTasks / totalUserTasks) * 100) : 0;
+
+    // Get today's date range
+    const today = new Date();
+    const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+
+    // Get today's meetings where user is an attendee
+    const todaysMeetings = await Meeting.countDocuments({
+      attendees: userId,
+      datetime: {
+        $gte: startOfDay,
+        $lt: endOfDay
+      }
+    });
+
+    // Get pending feedback requests (feedback requested from this user)
+    const pendingFeedback = await Feedback.countDocuments({
+      toUser: userId,
+      status: { $ne: 'completed' }
+    });
+
+    res.json({
+      activeTasks,
+      todaysMeetings,
+      pendingFeedback,
+      completionRate
+    });
+  } catch (error) {
+    console.error('Dashboard stats error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
 
 // @route   GET /api/tasks
 // @desc    Get all tasks (with optional filters)

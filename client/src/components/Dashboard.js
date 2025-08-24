@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useSocket } from '../contexts/SocketContext';
+import axios from 'axios';
+import { toast } from 'react-hot-toast';
 import { 
   LayoutDashboard, 
   CheckSquare, 
@@ -213,6 +215,33 @@ const Dashboard = () => {
 // Dashboard home component
 const DashboardHome = ({ navigate }) => {
   const { user } = useAuth();
+  const [dashboardStats, setDashboardStats] = useState({
+    activeTasks: 0,
+    todaysMeetings: 0,
+    pendingFeedback: 0,
+    completionRate: 0
+  });
+  const [statsLoading, setStatsLoading] = useState(true);
+
+  // Fetch dashboard stats
+  useEffect(() => {
+    const fetchDashboardStats = async () => {
+      try {
+        setStatsLoading(true);
+        const response = await axios.get('/api/tasks/dashboard-stats');
+        setDashboardStats(response.data);
+      } catch (error) {
+        console.error('Failed to fetch dashboard stats:', error);
+        toast.error('Failed to load dashboard statistics');
+      } finally {
+        setStatsLoading(false);
+      }
+    };
+
+    if (user) {
+      fetchDashboardStats();
+    }
+  }, [user]);
 
   return (
     <div>
@@ -233,7 +262,11 @@ const DashboardHome = ({ navigate }) => {
               <div className="ml-5 w-0 flex-1">
                 <dl>
                   <dt className="text-sm font-medium text-gray-500 truncate">Active Tasks</dt>
-                  <dd className="text-lg font-medium text-gray-900">Loading...</dd>
+                  <dd className="text-lg font-medium text-gray-900">
+                    {statsLoading ? 'Loading...' : (
+                      dashboardStats.activeTasks === 0 ? 'No active tasks' : dashboardStats.activeTasks
+                    )}
+                  </dd>
                 </dl>
               </div>
             </div>
@@ -249,7 +282,11 @@ const DashboardHome = ({ navigate }) => {
               <div className="ml-5 w-0 flex-1">
                 <dl>
                   <dt className="text-sm font-medium text-gray-500 truncate">Today's Meetings</dt>
-                  <dd className="text-lg font-medium text-gray-900">Loading...</dd>
+                  <dd className="text-lg font-medium text-gray-900">
+                    {statsLoading ? 'Loading...' : (
+                      dashboardStats.todaysMeetings === 0 ? 'No meetings today' : dashboardStats.todaysMeetings
+                    )}
+                  </dd>
                 </dl>
               </div>
             </div>
@@ -265,7 +302,11 @@ const DashboardHome = ({ navigate }) => {
               <div className="ml-5 w-0 flex-1">
                 <dl>
                   <dt className="text-sm font-medium text-gray-500 truncate">Pending Feedback</dt>
-                  <dd className="text-lg font-medium text-gray-900">Loading...</dd>
+                  <dd className="text-lg font-medium text-gray-900">
+                    {statsLoading ? 'Loading...' : (
+                      dashboardStats.pendingFeedback === 0 ? 'No pending feedback' : dashboardStats.pendingFeedback
+                    )}
+                  </dd>
                 </dl>
               </div>
             </div>
@@ -281,7 +322,9 @@ const DashboardHome = ({ navigate }) => {
               <div className="ml-5 w-0 flex-1">
                 <dl>
                   <dt className="text-sm font-medium text-gray-500 truncate">Completion Rate</dt>
-                  <dd className="text-lg font-medium text-gray-900">Loading...</dd>
+                  <dd className="text-lg font-medium text-gray-900">
+                    {statsLoading ? 'Loading...' : `${dashboardStats.completionRate}%`}
+                  </dd>
                 </dl>
               </div>
             </div>
