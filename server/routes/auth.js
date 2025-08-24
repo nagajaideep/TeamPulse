@@ -137,4 +137,29 @@ router.get('/me', auth, async (req, res) => {
   }
 });
 
+// @route   GET /api/auth/users
+// @desc    Get users by role (for coaches and mentors)
+// @access  Private
+router.get('/users', auth, async (req, res) => {
+  try {
+    // Only coaches and mentors can fetch users
+    if (req.user.role !== 'coach' && req.user.role !== 'mentor') {
+      return res.status(403).json({ message: 'Access denied' });
+    }
+
+    const { role } = req.query;
+    let query = {};
+    
+    if (role) {
+      query.role = role;
+    }
+
+    const users = await User.find(query).select('-password').sort({ name: 1 });
+    res.json(users);
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send('Server error');
+  }
+});
+
 module.exports = router;

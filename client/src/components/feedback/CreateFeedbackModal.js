@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { X, Star } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import { useAuth } from '../../contexts/AuthContext';
 import axios from 'axios';
 
 const CreateFeedbackModal = ({ onClose, onSubmit }) => {
   const [loading, setLoading] = useState(false);
   const [users, setUsers] = useState([]);
   const [tasks, setTasks] = useState([]);
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
     content: '',
     rating: 5,
@@ -29,7 +31,20 @@ const CreateFeedbackModal = ({ onClose, onSubmit }) => {
       setTasks(tasksResponse.data);
     } catch (error) {
       console.error('Failed to fetch data:', error);
+      toast.error('Failed to load users and tasks');
     }
+  };
+
+  // Filter users based on current user's role
+  const getAvailableUsers = () => {
+    if (!user || users.length === 0) return [];
+    
+    // Remove self from the list
+    const otherUsers = users.filter(u => u._id !== user.id);
+    
+    // For feedback, everyone should be able to give feedback to everyone else
+    // This promotes open communication and transparency
+    return otherUsers;
   };
 
   const handleChange = (e) => {
@@ -44,11 +59,14 @@ const CreateFeedbackModal = ({ onClose, onSubmit }) => {
     setLoading(true);
 
     try {
+      console.log('Submitting feedback with data:', formData);
       const response = await axios.post('/api/feedback', formData);
+      console.log('Feedback submitted successfully:', response.data);
       onSubmit(response.data);
       onClose();
       toast.success('Feedback submitted successfully!');
     } catch (error) {
+      console.error('Feedback submission error:', error.response?.data || error);
       toast.error(error.response?.data?.message || 'Failed to submit feedback');
     } finally {
       setLoading(false);
@@ -98,7 +116,7 @@ const CreateFeedbackModal = ({ onClose, onSubmit }) => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="">Select user</option>
-                {users.map((user) => (
+                {getAvailableUsers().map((user) => (
                   <option key={user._id} value={user._id}>
                     {user.name} ({user.role})
                   </option>

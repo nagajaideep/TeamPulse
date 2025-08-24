@@ -28,6 +28,7 @@ const Feedback = () => {
       const response = await axios.get('/api/feedback');
       setFeedback(response.data);
     } catch (error) {
+      console.error('Failed to fetch feedback:', error);
       toast.error('Failed to fetch feedback');
     } finally {
       setLoading(false);

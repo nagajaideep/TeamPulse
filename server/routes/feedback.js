@@ -47,14 +47,24 @@ router.post('/', [
   }
 
   try {
+    console.log('Feedback submission request body:', req.body);
+    console.log('User from token:', req.user);
+    
     const { content, rating, type, toUser, taskId } = req.body;
 
     // Validate that either toUser or taskId is provided based on type
     if (type === 'user' && !toUser) {
+      console.log('Error: toUser is required for user feedback');
       return res.status(400).json({ message: 'toUser is required for user feedback' });
     }
     if (type === 'task' && !taskId) {
+      console.log('Error: taskId is required for task feedback');
       return res.status(400).json({ message: 'taskId is required for task feedback' });
+    }
+
+    // For general feedback, toUser and taskId should be null/undefined
+    if (type === 'general') {
+      console.log('Processing general feedback - no specific target required');
     }
 
     // Validate user/task exists if provided

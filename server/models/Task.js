@@ -29,6 +29,74 @@ const taskSchema = new mongoose.Schema({
   deadline: {
     type: Date
   },
+  project: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Project'
+  },
+  attachments: [{
+    filename: String,
+    originalName: String,
+    path: String,
+    url: String,
+    type: String,
+    uploadedAt: {
+      type: Date,
+      default: Date.now
+    }
+  }],
+  voiceNotes: [{
+    url: String,
+    duration: Number,
+    uploadedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    },
+    uploadedAt: {
+      type: Date,
+      default: Date.now
+    },
+    transcript: String
+  }],
+  progressUpdates: [{
+    type: String,
+    text: String,
+    checklist: [{
+      item: String,
+      completed: Boolean,
+      completedAt: Date
+    }],
+    voiceNote: {
+      url: String,
+      duration: Number,
+      transcript: String
+    },
+    attachments: [{
+      name: String,
+      url: String,
+      type: String
+    }],
+    updatedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    },
+    updatedAt: {
+      type: Date,
+      default: Date.now
+    }
+  }],
+  githubIssue: {
+    url: String,
+    number: Number,
+    status: String
+  },
+  googleDocsLink: {
+    type: String,
+    trim: true
+  },
+  notionLink: {
+    type: String,
+    trim: true
+  },
   attachments: [{
     filename: String,
     originalName: String,

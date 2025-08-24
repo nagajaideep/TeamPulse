@@ -54,6 +54,29 @@ router.post('/', [
       return res.status(400).json({ message: 'Assignee not found' });
     }
 
+    // Role-based assignment restrictions
+    const currentUser = await User.findById(req.user.id);
+    
+    // Students can only assign tasks to fellow students
+    if (currentUser.role === 'student') {
+      if (assigneeUser.role !== 'student') {
+        return res.status(403).json({ 
+          message: 'Students can only assign tasks to fellow students' 
+        });
+      }
+    }
+    
+    // Mentors can assign to students and fellow mentors
+    if (currentUser.role === 'mentor') {
+      if (!['student', 'mentor'].includes(assigneeUser.role)) {
+        return res.status(403).json({ 
+          message: 'Mentors can only assign tasks to students and fellow mentors' 
+        });
+      }
+    }
+    
+    // Coaches can assign to anyone (no restrictions)
+
     const task = new Task({
       title,
       description,
@@ -102,6 +125,36 @@ router.put('/:id', [
     }
 
     const { title, description, assignee, status, priority, deadline } = req.body;
+
+    // If assignee is being changed, validate role-based assignment restrictions
+    if (assignee && assignee !== task.assignee.toString()) {
+      const assigneeUser = await User.findById(assignee);
+      if (!assigneeUser) {
+        return res.status(400).json({ message: 'Assignee not found' });
+      }
+
+      const currentUser = await User.findById(req.user.id);
+      
+      // Students can only assign tasks to fellow students
+      if (currentUser.role === 'student') {
+        if (assigneeUser.role !== 'student') {
+          return res.status(403).json({ 
+            message: 'Students can only assign tasks to fellow students' 
+          });
+        }
+      }
+      
+      // Mentors can assign to students and fellow mentors
+      if (currentUser.role === 'mentor') {
+        if (!['student', 'mentor'].includes(assigneeUser.role)) {
+          return res.status(403).json({ 
+            message: 'Mentors can only assign tasks to students and fellow mentors' 
+          });
+        }
+      }
+      
+      // Coaches can assign to anyone (no restrictions)
+    }
 
     // Update task fields
     task.title = title;

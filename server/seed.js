@@ -7,6 +7,7 @@ const User = require('./models/User');
 const Task = require('./models/Task');
 const Meeting = require('./models/Meeting');
 const Feedback = require('./models/Feedback');
+const Project = require('./models/Project');
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/teampulse')
@@ -20,11 +21,18 @@ const seedData = async () => {
     await Task.deleteMany({});
     await Meeting.deleteMany({});
     await Feedback.deleteMany({});
+    await Project.deleteMany({});
 
     console.log('Cleared existing data');
 
     // Create demo users
     const users = await User.create([
+      {
+        name: 'Dr. Michael Thompson',
+        email: 'coach@demo.com',
+        password: 'password',
+        role: 'coach'
+      },
       {
         name: 'Sarah Johnson',
         email: 'mentor@demo.com',
@@ -47,7 +55,7 @@ const seedData = async () => {
 
     console.log('Created demo users');
 
-    const [mentor, student1, student2] = users;
+    const [coach, mentor, student1, student2] = users;
 
     // Create demo tasks
     const tasks = await Task.create([
@@ -154,6 +162,7 @@ const seedData = async () => {
     console.log(`Meetings created: 1`);
     console.log(`Feedback created: ${feedback.length}`);
     console.log('\nDemo credentials:');
+    console.log('Coach: coach@demo.com / password');
     console.log('Mentor: mentor@demo.com / password');
     console.log('Student 1: student1@demo.com / password');
     console.log('Student 2: student2@demo.com / password');

@@ -12,13 +12,16 @@ import {
   Menu, 
   X,
   Wifi,
-  WifiOff
+  WifiOff,
+  BookOpen
 } from 'lucide-react';
 import KanbanBoard from './tasks/KanbanBoard';
 import CalendarView from './calendar/CalendarView';
 import Feedback from './feedback/Feedback';
 import Reports from './reports/Reports';
 import LoadingSpinner from './common/LoadingSpinner';
+import CoachDashboard from './dashboards/CoachDashboard';
+import Resources from './resources/Resources';
 
 const Dashboard = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -27,13 +30,38 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const navigation = [
-    { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-    { name: 'Tasks', href: '/dashboard/tasks', icon: CheckSquare },
-    { name: 'Calendar', href: '/dashboard/calendar', icon: Calendar },
-    { name: 'Feedback', href: '/dashboard/feedback', icon: MessageSquare },
-    { name: 'Reports', href: '/dashboard/reports', icon: BarChart3 },
-  ];
+  // Role-based navigation
+  const getNavigation = () => {
+    const baseNavigation = [
+      { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+      { name: 'Tasks', href: '/dashboard/tasks', icon: CheckSquare },
+      { name: 'Calendar', href: '/dashboard/calendar', icon: Calendar },
+      { name: 'Feedback', href: '/dashboard/feedback', icon: MessageSquare },
+      { name: 'Reports', href: '/dashboard/reports', icon: BarChart3 },
+    ];
+
+    // Add Resources for students and mentors
+    if (user?.role === 'student' || user?.role === 'mentor') {
+      baseNavigation.push({
+        name: 'Resources',
+        href: '/dashboard/resources',
+        icon: BookOpen
+      });
+    }
+
+    // Only add Coach View for users with 'coach' role
+    if (user?.role === 'coach') {
+      baseNavigation.push({
+        name: 'Coach View',
+        href: '/dashboard/coach',
+        icon: BarChart3
+      });
+    }
+
+    return baseNavigation;
+  };
+
+  const navigation = getNavigation();
 
   const handleLogout = () => {
     logout();
@@ -166,6 +194,14 @@ const Dashboard = () => {
           <Route path="/calendar" element={<CalendarView />} />
           <Route path="/feedback" element={<Feedback />} />
           <Route path="/reports" element={<Reports />} />
+          {/* Resources for students and mentors */}
+          {(user?.role === 'student' || user?.role === 'mentor') && (
+            <Route path="/resources" element={<Resources />} />
+          )}
+          {/* Coach-only route */}
+          {user?.role === 'coach' && (
+            <Route path="/coach" element={<CoachDashboard />} />
+          )}
         </Routes>
           </div>
         </main>

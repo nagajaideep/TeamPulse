@@ -72,6 +72,25 @@ const KanbanBoard = () => {
     }
   };
 
+  // Filter users based on current user's role for task assignment
+  const getAssignableUsers = () => {
+    if (!user || users.length === 0) return [];
+    
+    switch (user.role) {
+      case 'student':
+        // Students can only assign tasks to fellow students
+        return users.filter(u => u.role === 'student');
+      case 'mentor':
+        // Mentors can assign to students and fellow mentors
+        return users.filter(u => ['student', 'mentor'].includes(u.role));
+      case 'coach':
+        // Coaches can assign to anyone
+        return users;
+      default:
+        return [];
+    }
+  };
+
   const handleTaskCreated = (newTask) => {
     setTasks(prev => [...prev, newTask]);
     toast.success('New task created!');
@@ -266,7 +285,7 @@ const KanbanBoard = () => {
       {showTaskModal && selectedTask && (
         <TaskModal
           task={selectedTask}
-          users={users}
+          users={getAssignableUsers()}
           onClose={() => {
             setShowTaskModal(false);
             setSelectedTask(null);
@@ -279,7 +298,7 @@ const KanbanBoard = () => {
 
       {showCreateModal && (
         <CreateTaskModal
-          users={users}
+          users={getAssignableUsers()}
           onClose={() => setShowCreateModal(false)}
           onCreate={(newTask) => {
             setTasks(prev => [...prev, newTask]);
