@@ -27,7 +27,23 @@ const io = socketIo(server, {
 });
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: [
+    "http://localhost:3000",
+    "https://team-pulse-ji9xqewpg-jaideepchowdary2-7819s-projects.vercel.app",
+    /\.vercel\.app$/
+  ],
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "x-auth-token"]
+}));
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+  if (req.body && Object.keys(req.body).length > 0) {
+    console.log('Request body:', req.body);
+  }
+  next();
+});
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -107,6 +123,10 @@ app.use('/api/issues', require('./routes/issues'));
 app.use('/api/analytics', require('./routes/analytics'));
 app.use('/api/integrations', require('./routes/integrations'));
 
+
+app.get('/api/test', (req, res) => {
+  res.json({ message: 'API is working!', timestamp: new Date().toISOString() });
+});
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({

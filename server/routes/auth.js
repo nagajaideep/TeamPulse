@@ -6,6 +6,12 @@ const auth = require('../middleware/auth');
 
 const router = express.Router();
 
+// Add this debug route at the top
+router.get('/test', (req, res) => {
+  console.log('Auth test route accessed');
+  res.json({ message: 'Auth routes are working!', timestamp: new Date().toISOString() });
+});
+
 // @route   POST /api/auth/register
 // @desc    Register a new user
 // @access  Public
@@ -15,19 +21,29 @@ router.post('/register', [
   body('password', 'Please enter a password with 6 or more characters').isLength({ min: 6 }),
   body('role', 'Role must be student, mentor, or coach').isIn(['student', 'mentor', 'coach'])
 ], async (req, res) => {
+  console.log('=== REGISTER ATTEMPT ===');
+  console.log('Request body:', req.body);
+  console.log('Headers:', req.headers);
+
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
+    console.log('Validation errors:', errors.array());
     return res.status(400).json({ errors: errors.array() });
   }
 
   const { name, email, password, role } = req.body;
 
   try {
+    console.log('Checking if user exists for email:', email);
+
     // Check if user already exists
     let user = await User.findOne({ email });
     if (user) {
+      console.log('User already exists');
       return res.status(400).json({ message: 'User already exists' });
     }
+
+    console.log('Creating new user...');
 
     // Create new user
     user = new User({
@@ -38,6 +54,7 @@ router.post('/register', [
     });
 
     await user.save();
+    console.log('User saved successfully');
 
     // Create JWT token
     const payload = {
@@ -50,7 +67,11 @@ router.post('/register', [
       process.env.JWT_SECRET,
       { expiresIn: '7d' },
       (err, token) => {
-        if (err) throw err;
+        if (err) {
+          console.error('JWT signing error:', err);
+          throw err;
+        }
+        console.log('Registration successful, sending response');
         res.json({
           token,
           user: {
@@ -63,7 +84,8 @@ router.post('/register', [
       }
     );
   } catch (error) {
-    console.error(error.message);
+    console.error('Registration error:', error.message);
+    console.error('Full error:', error);
     res.status(500).send('Server error');
   }
 });
@@ -75,25 +97,38 @@ router.post('/login', [
   body('email', 'Please include a valid email').isEmail(),
   body('password', 'Password is required').exists()
 ], async (req, res) => {
+  console.log('=== LOGIN ATTEMPT ===');
+  console.log('Request body:', req.body);
+  console.log('Headers:', req.headers);
+
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
+    console.log('Validation errors:', errors.array());
     return res.status(400).json({ errors: errors.array() });
   }
 
   const { email, password } = req.body;
 
   try {
+    console.log('Looking for user with email:', email);
+
     // Check if user exists
     const user = await User.findOne({ email });
     if (!user) {
+      console.log('User not found');
       return res.status(400).json({ message: 'Invalid credentials' });
     }
+
+    console.log('User found, checking password...');
 
     // Check password
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
+      console.log('Password does not match');
       return res.status(400).json({ message: 'Invalid credentials' });
     }
+
+    console.log('Password matches, creating token...');
 
     // Create JWT token
     const payload = {
@@ -106,7 +141,11 @@ router.post('/login', [
       process.env.JWT_SECRET,
       { expiresIn: '7d' },
       (err, token) => {
-        if (err) throw err;
+        if (err) {
+          console.error('JWT signing error:', err);
+          throw err;
+        }
+        console.log('Login successful, sending response');
         res.json({
           token,
           user: {
@@ -119,7 +158,8 @@ router.post('/login', [
       }
     );
   } catch (error) {
-    console.error(error.message);
+    console.error('Login error:', error.message);
+    console.error('Full error:', error);
     res.status(500).send('Server error');
   }
 });
@@ -149,7 +189,7 @@ router.get('/users', auth, async (req, res) => {
 
     const { role } = req.query;
     let query = {};
-    
+
     if (role) {
       query.role = role;
     }
