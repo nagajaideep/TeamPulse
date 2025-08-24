@@ -26,6 +26,12 @@ const seedData = async () => {
     // Create demo users
     const users = await User.create([
       {
+        name: 'Coach Williams',
+        email: 'coach@demo.com',
+        password: 'password',
+        role: 'coach'
+      },
+      {
         name: 'Sarah Johnson',
         email: 'mentor@demo.com',
         password: 'password',
@@ -47,7 +53,7 @@ const seedData = async () => {
 
     console.log('Created demo users');
 
-    const [mentor, student1, student2] = users;
+    const [coach, mentor, student1, student2] = users;
 
     // Create demo tasks
     const tasks = await Task.create([
@@ -55,6 +61,7 @@ const seedData = async () => {
         title: 'Design User Interface',
         description: 'Create wireframes and mockups for the new dashboard',
         assignee: student1._id,
+        assignedBy: mentor._id,
         status: 'In Progress',
         priority: 'High',
         deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
@@ -64,6 +71,7 @@ const seedData = async () => {
         title: 'Implement Authentication',
         description: 'Set up JWT authentication and user management',
         assignee: student2._id,
+        assignedBy: mentor._id,
         status: 'To Do',
         priority: 'Critical',
         deadline: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), // 5 days from now
@@ -73,6 +81,7 @@ const seedData = async () => {
         title: 'Write API Documentation',
         description: 'Document all endpoints and create usage examples',
         assignee: student1._id,
+        assignedBy: mentor._id,
         status: 'Review',
         priority: 'Medium',
         deadline: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), // 3 days from now
@@ -82,6 +91,7 @@ const seedData = async () => {
         title: 'Set up Database Schema',
         description: 'Design and implement MongoDB schemas',
         assignee: student2._id,
+        assignedBy: mentor._id,
         status: 'Done',
         priority: 'High',
         deadline: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
@@ -91,6 +101,7 @@ const seedData = async () => {
         title: 'Create Unit Tests',
         description: 'Write comprehensive test coverage for core functionality',
         assignee: student1._id,
+        assignedBy: mentor._id,
         status: 'To Do',
         priority: 'Medium',
         deadline: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000), // 10 days from now
@@ -100,6 +111,7 @@ const seedData = async () => {
         title: 'Deploy to Production',
         description: 'Set up CI/CD pipeline and deploy application',
         assignee: student2._id,
+        assignedBy: mentor._id,
         status: 'To Do',
         priority: 'Critical',
         deadline: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // 14 days from now
@@ -110,7 +122,7 @@ const seedData = async () => {
     console.log('Created demo tasks');
 
     // Create demo meeting
-   /* const meeting = await Meeting.create({
+    const meeting = await Meeting.create({
       title: 'Weekly Progress Review',
       description: 'Review progress on current tasks and plan next week',
       datetime: new Date(Date.now() + 24 * 60 * 60 * 1000), // Tomorrow
@@ -118,7 +130,7 @@ const seedData = async () => {
       attendees: [mentor._id, student1._id, student2._id],
       createdBy: mentor._id
     });
-*/
+
     console.log('Created demo meeting');
 
     // Create demo feedback
@@ -154,6 +166,7 @@ const seedData = async () => {
     console.log(`Meetings created: 1`);
     console.log(`Feedback created: ${feedback.length}`);
     console.log('\nDemo credentials:');
+    console.log('Coach: coach@demo.com / password');
     console.log('Mentor: mentor@demo.com / password');
     console.log('Student 1: student1@demo.com / password');
     console.log('Student 2: student2@demo.com / password');

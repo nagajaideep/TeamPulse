@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { useSocket } from '../../contexts/SocketContext';
+import { getPriorityColor, formatDate } from '../../utils/taskUtils';
+import { getStatusColor } from '../../utils/roleUtils';
 import { 
   CheckSquare, 
   Calendar, 
@@ -9,7 +10,6 @@ import {
   Plus,
   Users,
   User,
-  Clock,
   TrendingUp,
   ArrowUp01
 } from 'lucide-react';
@@ -48,31 +48,6 @@ const StudentProgressCard = ({ student, tasksCount, completionRate }) => (
 );
 
 const TaskOverviewCard = ({ task }) => {
-  const getPriorityColor = (priority) => {
-    switch (priority) {
-      case 'Critical': return 'text-red-600 bg-red-100';
-      case 'High': return 'text-orange-600 bg-orange-100';
-      case 'Medium': return 'text-yellow-600 bg-yellow-100';
-      case 'Low': return 'text-green-600 bg-green-100';
-      default: return 'text-gray-600 bg-gray-100';
-    }
-  };
-
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'Done': return 'text-green-600 bg-green-100';
-      case 'In Progress': return 'text-blue-600 bg-blue-100';
-      case 'Review': return 'text-yellow-600 bg-yellow-100';
-      default: return 'text-gray-600 bg-gray-100';
-    }
-  };
-
-  const formatDate = (dateString) => {
-    if (!dateString) return null;
-    const date = new Date(dateString);
-    return date.toLocaleDateString();
-  };
-
   return (
     <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
       <div className="flex items-start justify-between mb-2">
@@ -111,7 +86,6 @@ const MentorDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const { user } = useAuth();
-  const { connected } = useSocket();
   const navigate = useNavigate();
 
   useEffect(() => {

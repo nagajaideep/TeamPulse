@@ -3,6 +3,7 @@ import io from 'socket.io-client';
 import { useAuth } from './AuthContext';
 
 const SocketContext = createContext();
+SocketContext.displayName = 'SocketContext';
 
 export const useSocket = () => {
   const context = useContext(SocketContext);
@@ -39,12 +40,10 @@ export const SocketProvider = ({ children }) => {
       });
 
       newSocket.on('connect', () => {
-        console.log('Socket connected');
         setConnected(true);
       });
 
       newSocket.on('disconnect', () => {
-        console.log('Socket disconnected');
         setConnected(false);
       });
 

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import { useSocket } from '../../contexts/SocketContext';
 import { toast } from 'react-hot-toast';
 import { 
   Plus, 
@@ -13,6 +12,8 @@ import {
   Circle
 } from 'lucide-react';
 import axios from 'axios';
+import { getPriorityColor, formatDate, isOverdue } from '../../utils/taskUtils';
+import { useSocket } from '../../contexts/SocketContext';
 import TaskModal from './TaskModal';
 import CreateTaskModal from './CreateTaskModal';
 
@@ -49,7 +50,7 @@ const KanbanBoard = () => {
       off('taskMoved', handleTaskMoved);
       off('taskDeleted', handleTaskDeleted);
     };
-  }, []);
+  }, [off, on]);
 
   const fetchTasks = async () => {
     try {
@@ -120,27 +121,9 @@ const KanbanBoard = () => {
     }
   };
 
-  const getPriorityColor = (priority) => {
-    switch (priority) {
-      case 'Critical': return 'text-red-600 bg-red-100';
-      case 'High': return 'text-orange-600 bg-orange-100';
-      case 'Medium': return 'text-yellow-600 bg-yellow-100';
-      case 'Low': return 'text-green-600 bg-green-100';
-      default: return 'text-gray-600 bg-gray-100';
-    }
-  };
 
 
-  const formatDate = (dateString) => {
-    if (!dateString) return null;
-    const date = new Date(dateString);
-    return date.toLocaleDateString();
-  };
 
-  const isOverdue = (deadline) => {
-    if (!deadline) return false;
-    return new Date(deadline) < new Date();
-  };
 
   if (loading) {
     return (

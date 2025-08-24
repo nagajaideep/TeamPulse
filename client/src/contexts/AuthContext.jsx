@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 
 const AuthContext = createContext();
+AuthContext.displayName = 'AuthContext';
 
 export const useAuth = () => {
   const context = useContext(AuthContext);

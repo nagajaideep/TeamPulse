@@ -1,18 +1,16 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
+import './index.css'
 import StudentDashboard from './components/dashboards/StudentDashboard';
 import MentorDashboard from './components/dashboards/MentorDashboard';
 import CoachDashboard from './components/dashboards/CoachDashboard';
 import { 
   LogOut, 
   Menu,
-  Wifi,
-  SquareUserRound,
-  UserRound,
-  KeySquare
+  Wifi
 } from 'lucide-react';
-import { formatDashboardTitle } from './mockData/roleBasedDashboardMockData';
+import { getRoleIcon, getRoleColor, formatDashboardTitle } from './utils/roleUtils';
 
 // Mock Auth Context for Preview
 const MockAuthProvider = ({ children, userRole = 'student' }) => {
@@ -76,40 +74,38 @@ const MockSocketProvider = ({ children }) => {
 const DashboardPreview = ({ userRole, mockAuth, mockSocket }) => {
   const [setSidebarOpen] = useState(false);
 
-  const getRoleIcon = (role) => {
-    switch (role) {
-      case 'student':
-        return <SquareUserRound className="h-5 w-5" />;
-      case 'mentor':
-        return <UserRound className="h-5 w-5" />;
-      case 'coach':
-        return <KeySquare className="h-5 w-5" />;
-      default:
-        return <UserRound className="h-5 w-5" />;
-    }
+  // Ensure mockAuth is available
+  const auth = mockAuth || {
+    user: {
+      id: '507f1f77bcf86cd799439011',
+      name: 'John Smith',
+      email: 'john.smith@example.com',
+      role: userRole || 'student',
+      avatarUrl: 'https://i.pravatar.cc/150?img=1'
+    },
+    isAuthenticated: true,
+    loading: false,
+    login: () => {},
+    logout: () => {},
+    register: () => {}
   };
 
-  const getRoleColor = (role) => {
-    switch (role) {
-      case 'student':
-        return 'text-blue-600 bg-blue-100';
-      case 'mentor':
-        return 'text-green-600 bg-green-100';
-      case 'coach':
-        return 'text-purple-600 bg-purple-100';
-      default:
-        return 'text-gray-600 bg-gray-100';
-    }
-  };
+
 
   const renderDashboard = () => {
     // Mock the useAuth and useSocket hooks
     React.useContext = (context) => {
       if (context.displayName === 'AuthContext') {
-        return mockAuth;
+        return auth;
       }
       if (context.displayName === 'SocketContext') {
-        return mockSocket;
+        return mockSocket || {
+          socket: null,
+          connected: true,
+          emit: () => {},
+          on: () => {},
+          off: () => {}
+        };
       }
       return {};
     };
@@ -197,8 +193,8 @@ const DashboardPreview = ({ userRole, mockAuth, mockSocket }) => {
               {/* User menu */}
               <div className="flex items-center gap-x-4">
                 <div className="text-sm">
-                  <p className="font-medium text-gray-900">{mockAuth.user?.name}</p>
-                  <p className="text-gray-500 capitalize">{formatDashboardTitle(mockAuth.user?.role)}</p>
+                  <p className="font-medium text-gray-900">{auth.user?.name}</p>
+                  <p className="text-gray-500 capitalize">{formatDashboardTitle(auth.user?.role)}</p>
                 </div>
                 <button className="flex items-center gap-x-2 text-sm text-gray-500 hover:text-gray-700">
                   <LogOut className="h-4 w-4" />

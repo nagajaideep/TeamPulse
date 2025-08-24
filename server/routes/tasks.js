@@ -3,6 +3,7 @@ import { body, validationResult } from 'express-validator';
 import Task from '../models/Task.js';
 import User from '../models/User.js';
 import auth from '../middleware/auth.js';
+import { withTaskPopulate, populateTask } from '../utils/populateUtils.js';
 
 const router = express.Router();
 
@@ -29,10 +30,7 @@ router.get('/', auth, async (req, res) => {
     if (assignee) filter.assignee = assignee;
     if (priority) filter.priority = priority;
 
-    const tasks = await Task.find(filter)
-      .populate('assignee', 'name email role')
-      .populate('assignedBy', 'name email role')
-      .populate('createdBy', 'name email role')
+    const tasks = await withTaskPopulate(Task.find(filter))
       .sort({ createdAt: -1 });
 
     res.json(tasks);
@@ -80,9 +78,7 @@ router.post('/', [
     await task.save();
 
     // Populate the task with user details
-    await task.populate('assignee', 'name email role');
-    await task.populate('assignedBy', 'name email role');
-    await task.populate('createdBy', 'name email role');
+    await populateTask(task);
 
     // Emit socket event for real-time updates
     const io = req.app.get('io');
@@ -128,9 +124,7 @@ router.put('/:id', [
     await task.save();
 
     // Populate the task with user details
-    await task.populate('assignee', 'name email role');
-    await task.populate('assignedBy', 'name email role');
-    await task.populate('createdBy', 'name email role');
+    await populateTask(task);
 
     // Emit socket event for real-time updates
     const io = req.app.get('io');
@@ -166,9 +160,7 @@ router.put('/:id/move', [
     await task.save();
 
     // Populate the task with user details
-    await task.populate('assignee', 'name email role');
-    await task.populate('assignedBy', 'name email role');
-    await task.populate('createdBy', 'name email role');
+    await populateTask(task);
 
     // Emit socket event for real-time updates
     const io = req.app.get('io');
@@ -209,10 +201,7 @@ router.delete('/:id', auth, async (req, res) => {
 // @access  Private
 router.get('/:id', auth, async (req, res) => {
   try {
-    const task = await Task.findById(req.params.id)
-      .populate('assignee', 'name email role')
-      .populate('assignedBy', 'name email role')
-      .populate('createdBy', 'name email role');
+    const task = await withTaskPopulate(Task.findById(req.params.id));
 
     if (!task) {
       return res.status(404).json({ message: 'Task not found' });

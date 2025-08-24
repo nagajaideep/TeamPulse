@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, Calendar, User, AlertCircle, Clock, CheckCircle, Circle, Edit, Trash2 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import axios from 'axios';
+import { getPriorityColor, formatDate, isOverdue } from '../../utils/taskUtils';
 
 const TaskModal = ({ task, users, onClose, onUpdate }) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -53,15 +54,6 @@ const TaskModal = ({ task, users, onClose, onUpdate }) => {
     }
   };
 
-  const getPriorityColor = (priority) => {
-    switch (priority) {
-      case 'Critical': return 'text-red-600 bg-red-100';
-      case 'High': return 'text-orange-600 bg-orange-100';
-      case 'Medium': return 'text-yellow-600 bg-yellow-100';
-      case 'Low': return 'text-green-600 bg-green-100';
-      default: return 'text-gray-600 bg-gray-100';
-    }
-  };
 
   const getStatusIcon = (status) => {
     switch (status) {
@@ -72,16 +64,7 @@ const TaskModal = ({ task, users, onClose, onUpdate }) => {
     }
   };
 
-  const formatDate = (dateString) => {
-    if (!dateString) return 'No deadline';
-    const date = new Date(dateString);
-    return date.toLocaleDateString();
-  };
 
-  const isOverdue = (deadline) => {
-    if (!deadline) return false;
-    return new Date(deadline) < new Date();
-  };
 
   return (
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">

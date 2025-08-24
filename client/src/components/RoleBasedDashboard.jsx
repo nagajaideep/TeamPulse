@@ -144,25 +144,9 @@ const RoleBasedDashboard = () => {
 
               {/* Role-based task routes */}
               <Route 
-                path="/student/tasks" 
+                path="/:role/tasks" 
                 element={
-                  <PermissionGuard requiredRole="student" fallback={<Navigate to={getDashboardRoute()} />}>
-                    <KanbanBoard />
-                  </PermissionGuard>
-                } 
-              />
-              <Route 
-                path="/mentor/tasks" 
-                element={
-                  <PermissionGuard requiredRole="mentor" fallback={<Navigate to={getDashboardRoute()} />}>
-                    <KanbanBoard />
-                  </PermissionGuard>
-                } 
-              />
-              <Route 
-                path="/coach/tasks" 
-                element={
-                  <PermissionGuard requiredRole="coach" fallback={<Navigate to={getDashboardRoute()} />}>
+                  <PermissionGuard allowedRoles={['student', 'mentor', 'coach']} fallback={<Navigate to={getDashboardRoute()} />}>
                     <KanbanBoard />
                   </PermissionGuard>
                 } 

@@ -1,15 +1,13 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { getRoleIcon, getRoleColor } from '../../utils/roleUtils';
 import { 
   LayoutDashboard, 
   CheckSquare, 
   Calendar, 
   MessageSquare, 
   BarChart3,
-  Users,
-  UserRound,
-  KeySquare,
-  SquareUserRound
+  Users
 } from 'lucide-react';
 
 const RoleBasedNavigation = ({ sidebarOpen, setSidebarOpen }) => {
@@ -104,31 +102,7 @@ const RoleBasedNavigation = ({ sidebarOpen, setSidebarOpen }) => {
     return location.pathname === path;
   };
 
-  const getRoleIcon = (role) => {
-    switch (role) {
-      case 'student':
-        return <SquareUserRound className="h-5 w-5" />;
-      case 'mentor':
-        return <UserRound className="h-5 w-5" />;
-      case 'coach':
-        return <KeySquare className="h-5 w-5" />;
-      default:
-        return <UserRound className="h-5 w-5" />;
-    }
-  };
 
-  const getRoleColor = (role) => {
-    switch (role) {
-      case 'student':
-        return 'text-blue-600 bg-blue-100';
-      case 'mentor':
-        return 'text-green-600 bg-green-100';
-      case 'coach':
-        return 'text-purple-600 bg-purple-100';
-      default:
-        return 'text-gray-600 bg-gray-100';
-    }
-  };
 
   return (
     <>

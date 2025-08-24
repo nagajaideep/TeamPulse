@@ -1,3 +1,5 @@
+import { formatUserRole, formatDashboardTitle } from '../utils/roleUtils.js';
+
 // Role-based dashboard mock data
 export const UserRole = {
   STUDENT: 'student',
@@ -18,33 +20,9 @@ export const TaskPermission = {
   CREATE_ASSIGN: 'create_assign',
   VIEW_ALL: 'view_all'
 };
-
-// String formatters
-export const formatUserRole = (role) => {
-  switch (role) {
-    case 'student':
-      return 'Student';
-    case 'mentor':
-      return 'Mentor';
-    case 'coach':
-      return 'Coach';
-    default:
-      return role;
-  }
-};
-
-export const formatDashboardTitle = (role) => {
-  switch (role) {
-    case 'student':
-      return 'Student Dashboard';
-    case 'mentor':
-      return 'Mentor Dashboard';
-    case 'coach':
-      return 'Coach Dashboard';
-    default:
-      return 'Dashboard';
-  }
-};
+// Import utility functions from centralized location
+// Re-export for backward compatibility
+export { formatUserRole, formatDashboardTitle };
 
 export const formatTaskCount = (count, role) => {
   if (role === 'student') {

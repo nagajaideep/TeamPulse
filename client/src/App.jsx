@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { Toaster } from 'react-hot-toast';
 import { useAuth } from './contexts/AuthContext';
 import Login from './components/auth/Login';
+import './index.css'
 import Register from './components/auth/Register';
 import RoleBasedDashboard from './components/RoleBasedDashboard';
 import LoadingSpinner from './components/common/LoadingSpinner';
