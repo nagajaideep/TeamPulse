@@ -5,10 +5,17 @@ const http = require('http');
 const socketIo = require('socket.io');
 const path = require('path');
 const fs = require('fs');
-require('dotenv').config({ path: path.join(__dirname, '.env') });
-console.log("JWT Secret:", process.env.JWT_SECRET);
-console.log("Current working directory:", process.cwd());
-console.log("__dirname:", __dirname);
+
+// Fix: Simple dotenv config (remove the path option for production)
+require('dotenv').config();
+
+// Add debug logging for environment variables
+console.log('Environment Variables Check:');
+console.log('NODE_ENV:', process.env.NODE_ENV);
+console.log('JWT_SECRET:', process.env.JWT_SECRET ? 'Set' : 'Not Set');
+console.log('MONGO_URI:', process.env.MONGO_URI ? 'Set' : 'Not Set');
+console.log('CLIENT_URL:', process.env.CLIENT_URL);
+console.log('PORT:', process.env.PORT);
 
 const app = express();
 const server = http.createServer(app);
@@ -43,10 +50,33 @@ uploadDirs.forEach(dir => {
 // Serve uploaded files
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// MongoDB Connection
-mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/teampulse')
-  .then(() => console.log('MongoDB connected'))
-  .catch(err => console.error('MongoDB connection error:', err));
+// MongoDB Connection with proper error handling and logging
+const connectDB = async () => {
+  try {
+    const mongoURI = process.env.MONGO_URI;
+
+    if (!mongoURI) {
+      throw new Error('MONGO_URI environment variable is not set');
+    }
+
+    console.log('Attempting to connect to MongoDB Atlas...');
+    console.log('Connection string starts with:', mongoURI.substring(0, 20) + '...');
+
+    const conn = await mongoose.connect(mongoURI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+
+    console.log(`MongoDB Connected Successfully: ${conn.connection.host}`);
+  } catch (error) {
+    console.error('MongoDB connection error:', error.message);
+    console.error('Full error:', error);
+    process.exit(1);
+  }
+};
+
+// Call the connection function
+connectDB();
 
 // Socket.IO connection handling
 io.on('connection', (socket) => {
@@ -79,10 +109,16 @@ app.use('/api/integrations', require('./routes/integrations'));
 
 // Health check
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', message: 'TeamPulse API is running' });
+  res.json({
+    status: 'OK',
+    message: 'TeamPulse API is running',
+    mongoConnected: mongoose.connection.readyState === 1,
+    environment: process.env.NODE_ENV
+  });
 });
 
 const PORT = process.env.PORT || 5001;
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+  console.log(`Health check available at: http://localhost:${PORT}/api/health`);
 });
