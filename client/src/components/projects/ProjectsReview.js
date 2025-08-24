@@ -10,12 +10,14 @@ import {
   Filter,
   Search,
   Settings,
-  Plus
+  Plus,
+  Eye
 } from 'lucide-react';
 import axios from 'axios';
 import IntegrationsModal from '../integrations/IntegrationsModal';
 import IntegrationStatus from '../integrations/IntegrationStatus';
 import CreateProjectModal from './CreateProjectModal';
+import ProjectModal from './ProjectModal';
 
 const ProjectsReview = ({ onBack }) => {
   const [projects, setProjects] = useState([]);
@@ -25,6 +27,8 @@ const ProjectsReview = ({ onBack }) => {
   const [selectedProjectId, setSelectedProjectId] = useState(null);
   const [showIntegrationsModal, setShowIntegrationsModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [selectedProject, setSelectedProject] = useState(null);
+  const [showProjectModal, setShowProjectModal] = useState(false);
 
   useEffect(() => {
     fetchProjects();
@@ -49,6 +53,22 @@ const ProjectsReview = ({ onBack }) => {
 
   const handleProjectCreated = (newProject) => {
     setProjects(prev => [newProject, ...prev]);
+  };
+
+  const handleViewProject = (project) => {
+    setSelectedProject(project);
+    setShowProjectModal(true);
+  };
+
+  const handleCloseProjectModal = () => {
+    setShowProjectModal(false);
+    setSelectedProject(null);
+  };
+
+  const handleProjectUpdate = (updatedProject) => {
+    setProjects(projects.map(project => 
+      project._id === updatedProject._id ? updatedProject : project
+    ));
   };
 
   const getStatusColor = (status) => {
@@ -255,8 +275,12 @@ const ProjectsReview = ({ onBack }) => {
 
             <div className="border-t pt-4">
               <div className="flex justify-end space-x-3">
-                <button className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors">
-                  View Details
+                <button 
+                  onClick={() => handleViewProject(project)}
+                  className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
+                >
+                  <Eye className="h-4 w-4" />
+                  <span>View Details</span>
                 </button>
                 <button 
                   onClick={() => {
@@ -305,6 +329,15 @@ const ProjectsReview = ({ onBack }) => {
         onClose={() => setShowCreateModal(false)}
         onProjectCreated={handleProjectCreated}
       />
+
+      {/* Project Detail Modal */}
+      {showProjectModal && selectedProject && (
+        <ProjectModal
+          project={selectedProject}
+          onClose={handleCloseProjectModal}
+          onUpdate={handleProjectUpdate}
+        />
+      )}
     </div>
   );
 };

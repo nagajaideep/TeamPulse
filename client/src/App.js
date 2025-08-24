@@ -6,6 +6,7 @@ import Login from './components/auth/Login';
 import Register from './components/auth/Register';
 import Dashboard from './components/Dashboard';
 import LoadingSpinner from './components/common/LoadingSpinner';
+import AttachmentDeleteTest from './components/debug/AttachmentDeleteTest';
 
 function App() {
   const { isAuthenticated, loading } = useAuth();
@@ -40,6 +41,10 @@ function App() {
           <Route 
             path="/dashboard/*" 
             element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />} 
+          />
+          <Route 
+            path="/debug-attachments" 
+            element={isAuthenticated ? <AttachmentDeleteTest /> : <Navigate to="/login" />} 
           />
           <Route 
             path="/" 

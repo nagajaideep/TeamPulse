@@ -271,4 +271,82 @@ router.delete('/:id', auth, async (req, res) => {
   }
 });
 
+// @route   DELETE /api/issues/:id/attachments/:attachmentId
+// @desc    Delete attachment from issue
+// @access  Private
+router.delete('/:id/attachments/:attachmentId', auth, async (req, res) => {
+  try {
+    const issue = await Issue.findById(req.params.id);
+    if (!issue) {
+      return res.status(404).json({ message: 'Issue not found' });
+    }
+
+    const attachmentIndex = issue.attachments.findIndex(
+      attachment => attachment._id.toString() === req.params.attachmentId
+    );
+
+    if (attachmentIndex === -1) {
+      return res.status(404).json({ message: 'Attachment not found' });
+    }
+
+    // Remove the attachment from the array
+    const removedAttachment = issue.attachments[attachmentIndex];
+    issue.attachments.splice(attachmentIndex, 1);
+    await issue.save();
+
+    // Delete the file from filesystem
+    if (removedAttachment.url) {
+      const fileName = removedAttachment.url.replace('/uploads/issues/', '');
+      const filePath = path.join(__dirname, '..', 'uploads', 'issues', fileName);
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+    }
+
+    res.json({ message: 'Attachment deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting attachment:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// @route   DELETE /api/issues/:id/voice-notes/:voiceNoteId
+// @desc    Delete voice note from issue
+// @access  Private
+router.delete('/:id/voice-notes/:voiceNoteId', auth, async (req, res) => {
+  try {
+    const issue = await Issue.findById(req.params.id);
+    if (!issue) {
+      return res.status(404).json({ message: 'Issue not found' });
+    }
+
+    const voiceNoteIndex = issue.voiceNotes.findIndex(
+      voiceNote => voiceNote._id.toString() === req.params.voiceNoteId
+    );
+
+    if (voiceNoteIndex === -1) {
+      return res.status(404).json({ message: 'Voice note not found' });
+    }
+
+    // Remove the voice note from the array
+    const removedVoiceNote = issue.voiceNotes[voiceNoteIndex];
+    issue.voiceNotes.splice(voiceNoteIndex, 1);
+    await issue.save();
+
+    // Delete the file from filesystem
+    if (removedVoiceNote.url) {
+      const fileName = removedVoiceNote.url.replace('/uploads/issues/', '');
+      const filePath = path.join(__dirname, '..', 'uploads', 'issues', fileName);
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+    }
+
+    res.json({ message: 'Voice note deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting voice note:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 module.exports = router;

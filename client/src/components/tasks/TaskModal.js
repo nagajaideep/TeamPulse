@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, Calendar, User, AlertCircle, Clock, CheckCircle, Circle, Edit, Trash2 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import axios from 'axios';
+import AttachmentManager from '../common/AttachmentManager';
 
 const TaskModal = ({ task, users, onClose, onUpdate }) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -278,6 +279,28 @@ const TaskModal = ({ task, users, onClose, onUpdate }) => {
                   )}
                 </div>
               </div>
+            </div>
+
+            {/* Attachments and Voice Notes */}
+            <div className="pt-4 border-t border-gray-200">
+              <AttachmentManager
+                entityId={task._id}
+                entityType="task"
+                attachments={task.attachments || []}
+                voiceNotes={task.voiceNotes || []}
+                onAttachmentsUpdate={async () => {
+                  // Refresh task data by fetching the latest version
+                  try {
+                    const response = await axios.get(`/api/tasks/${task._id}`);
+                    onUpdate(response.data);
+                  } catch (error) {
+                    console.error('Failed to refresh task data:', error);
+                    toast.error('Failed to refresh task data');
+                  }
+                }}
+                canUpload={true}
+                canDelete={true}
+              />
             </div>
 
             <div className="pt-4 border-t border-gray-200">

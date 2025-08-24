@@ -9,9 +9,11 @@ import {
   ArrowLeft,
   Filter,
   Plus,
-  MessageSquare
+  MessageSquare,
+  Eye
 } from 'lucide-react';
 import axios from 'axios';
+import IssueModal from './IssueModal';
 
 const IssuesView = ({ onBack }) => {
   const [issues, setIssues] = useState([]);
@@ -19,6 +21,8 @@ const IssuesView = ({ onBack }) => {
   const [filter, setFilter] = useState('all');
   const [severityFilter, setSeverityFilter] = useState('all');
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [selectedIssue, setSelectedIssue] = useState(null);
+  const [showIssueModal, setShowIssueModal] = useState(false);
 
   useEffect(() => {
     fetchIssues();
@@ -103,6 +107,22 @@ const IssuesView = ({ onBack }) => {
       console.error('Error updating issue status:', error);
       alert('Failed to update issue status');
     }
+  };
+
+  const handleViewIssue = (issue) => {
+    setSelectedIssue(issue);
+    setShowIssueModal(true);
+  };
+
+  const handleCloseIssueModal = () => {
+    setShowIssueModal(false);
+    setSelectedIssue(null);
+  };
+
+  const handleIssueUpdate = (updatedIssue) => {
+    setIssues(issues.map(issue => 
+      issue._id === updatedIssue._id ? updatedIssue : issue
+    ));
   };
 
   if (loading) {
@@ -294,7 +314,11 @@ const IssuesView = ({ onBack }) => {
                     <MessageSquare className="h-4 w-4 mr-1" />
                     Comment
                   </button>
-                  <button className="px-3 py-1 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors">
+                  <button 
+                    onClick={() => handleViewIssue(issue)}
+                    className="flex items-center px-3 py-1 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
+                  >
+                    <Eye className="h-4 w-4 mr-1" />
                     View Details
                   </button>
                 </div>
@@ -366,6 +390,15 @@ const IssuesView = ({ onBack }) => {
             </form>
           </div>
         </div>
+      )}
+
+      {/* Issue Detail Modal */}
+      {showIssueModal && selectedIssue && (
+        <IssueModal
+          issue={selectedIssue}
+          onClose={handleCloseIssueModal}
+          onUpdate={handleIssueUpdate}
+        />
       )}
     </div>
   );

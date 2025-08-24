@@ -234,4 +234,82 @@ router.delete('/:id', auth, async (req, res) => {
   }
 });
 
+// @route   DELETE /api/projects/:id/files/:fileId
+// @desc    Delete file from project
+// @access  Private
+router.delete('/:id/files/:fileId', auth, async (req, res) => {
+  try {
+    const project = await Project.findById(req.params.id);
+    if (!project) {
+      return res.status(404).json({ message: 'Project not found' });
+    }
+
+    const fileIndex = project.files.findIndex(
+      file => file._id.toString() === req.params.fileId
+    );
+
+    if (fileIndex === -1) {
+      return res.status(404).json({ message: 'File not found' });
+    }
+
+    // Remove the file from the array
+    const removedFile = project.files[fileIndex];
+    project.files.splice(fileIndex, 1);
+    await project.save();
+
+    // Delete the file from filesystem
+    if (removedFile.url) {
+      const fileName = removedFile.url.replace('/uploads/projects/', '');
+      const filePath = path.join(__dirname, '..', 'uploads', 'projects', fileName);
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+    }
+
+    res.json({ message: 'File deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting file:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// @route   DELETE /api/projects/:id/voice-notes/:voiceNoteId
+// @desc    Delete voice note from project
+// @access  Private
+router.delete('/:id/voice-notes/:voiceNoteId', auth, async (req, res) => {
+  try {
+    const project = await Project.findById(req.params.id);
+    if (!project) {
+      return res.status(404).json({ message: 'Project not found' });
+    }
+
+    const voiceNoteIndex = project.voiceNotes.findIndex(
+      voiceNote => voiceNote._id.toString() === req.params.voiceNoteId
+    );
+
+    if (voiceNoteIndex === -1) {
+      return res.status(404).json({ message: 'Voice note not found' });
+    }
+
+    // Remove the voice note from the array
+    const removedVoiceNote = project.voiceNotes[voiceNoteIndex];
+    project.voiceNotes.splice(voiceNoteIndex, 1);
+    await project.save();
+
+    // Delete the file from filesystem
+    if (removedVoiceNote.url) {
+      const fileName = removedVoiceNote.url.replace('/uploads/projects/', '');
+      const filePath = path.join(__dirname, '..', 'uploads', 'projects', fileName);
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+    }
+
+    res.json({ message: 'Voice note deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting voice note:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 module.exports = router;

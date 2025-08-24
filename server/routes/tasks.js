@@ -3,6 +3,28 @@ const { body, validationResult } = require('express-validator');
 const Task = require('../models/Task');
 const User = require('../models/User');
 const auth = require('../middleware/auth');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+
+// Configure multer for file uploads
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/tasks');
+  },
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}-${file.originalname}`);
+  }
+});
+
+const upload = multer({ 
+  storage,
+  limits: { fileSize: 50 * 1024 * 1024 }, // 50MB limit
+  fileFilter: (req, file, cb) => {
+    // Allow all file types for attachments, audio files for voice notes
+    cb(null, true);
+  }
+});
 
 const router = express.Router();
 
@@ -258,6 +280,194 @@ router.get('/:id', auth, async (req, res) => {
   } catch (error) {
     console.error(error.message);
     res.status(500).send('Server error');
+  }
+});
+
+// @route   POST /api/tasks/:id/attachments
+// @desc    Upload attachment to task
+// @access  Private
+router.post('/:id/attachments', auth, upload.single('file'), async (req, res) => {
+  try {
+    const task = await Task.findById(req.params.id);
+    if (!task) {
+      return res.status(404).json({ message: 'Task not found' });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({ message: 'No file uploaded' });
+    }
+
+    const attachmentData = {
+      filename: req.file.filename,
+      originalName: req.file.originalname,
+      path: req.file.path,
+      url: `/uploads/tasks/${req.file.filename}`,
+      type: path.extname(req.file.originalname).toLowerCase()
+    };
+
+    task.attachments.push(attachmentData);
+    await task.save();
+
+    res.json({ message: 'Attachment uploaded successfully', attachment: attachmentData });
+  } catch (error) {
+    console.error('Error uploading attachment:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// @route   POST /api/tasks/:id/voice-notes
+// @desc    Upload voice note to task
+// @access  Private
+router.post('/:id/voice-notes', auth, upload.single('voiceNote'), async (req, res) => {
+  try {
+    const task = await Task.findById(req.params.id);
+    if (!task) {
+      return res.status(404).json({ message: 'Task not found' });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({ message: 'No voice note uploaded' });
+    }
+
+    const voiceNoteData = {
+      url: `/uploads/tasks/${req.file.filename}`,
+      duration: req.body.duration || 0,
+      uploadedBy: req.user.id,
+      transcript: req.body.transcript || ''
+    };
+
+    task.voiceNotes.push(voiceNoteData);
+    await task.save();
+
+    res.json({ message: 'Voice note uploaded successfully', voiceNote: voiceNoteData });
+  } catch (error) {
+    console.error('Error uploading voice note:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// @route   DELETE /api/tasks/:id/attachments/:attachmentId
+// @desc    Delete attachment from task
+// @access  Private
+router.delete('/:id/attachments/:attachmentId', auth, async (req, res) => {
+  try {
+    console.log('Delete attachment request:', req.params);
+    
+    const task = await Task.findById(req.params.id);
+    if (!task) {
+      console.log('Task not found:', req.params.id);
+      return res.status(404).json({ message: 'Task not found' });
+    }
+
+    console.log('Task found, attachments:', task.attachments.length);
+
+    const attachmentIndex = task.attachments.findIndex(
+      attachment => attachment._id.toString() === req.params.attachmentId
+    );
+
+    if (attachmentIndex === -1) {
+      console.log('Attachment not found:', req.params.attachmentId);
+      console.log('Available attachments:', task.attachments.map(a => a._id.toString()));
+      return res.status(404).json({ message: 'Attachment not found' });
+    }
+
+    // Remove the attachment from the array
+    const removedAttachment = task.attachments[attachmentIndex];
+    console.log('Removing attachment:', removedAttachment);
+    
+    task.attachments.splice(attachmentIndex, 1);
+    await task.save();
+
+    // Delete the file from filesystem
+    try {
+      if (removedAttachment.path) {
+        const filePath = path.join(__dirname, '..', removedAttachment.path);
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath);
+          console.log('File deleted from path:', filePath);
+        }
+      } else if (removedAttachment.url) {
+        // Handle URL-based paths
+        const fileName = removedAttachment.url.replace('/uploads/tasks/', '');
+        const filePath = path.join(__dirname, '..', 'uploads', 'tasks', fileName);
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath);
+          console.log('File deleted from URL path:', filePath);
+        }
+      }
+    } catch (fileError) {
+      console.error('Error deleting file:', fileError);
+      // Don't fail the request if file deletion fails
+    }
+
+    console.log('Attachment deleted successfully');
+    res.json({ message: 'Attachment deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting attachment:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// @route   DELETE /api/tasks/:id/voice-notes/:voiceNoteId
+// @desc    Delete voice note from task
+// @access  Private
+router.delete('/:id/voice-notes/:voiceNoteId', auth, async (req, res) => {
+  try {
+    const task = await Task.findById(req.params.id);
+    if (!task) {
+      return res.status(404).json({ message: 'Task not found' });
+    }
+
+    const voiceNoteIndex = task.voiceNotes.findIndex(
+      voiceNote => voiceNote._id.toString() === req.params.voiceNoteId
+    );
+
+    if (voiceNoteIndex === -1) {
+      return res.status(404).json({ message: 'Voice note not found' });
+    }
+
+    // Remove the voice note from the array
+    const removedVoiceNote = task.voiceNotes[voiceNoteIndex];
+    task.voiceNotes.splice(voiceNoteIndex, 1);
+    await task.save();
+
+    // Optionally delete the file from filesystem
+    if (removedVoiceNote.url) {
+      const fileName = removedVoiceNote.url.replace('/uploads/tasks/', '');
+      const filePath = path.join(__dirname, '..', 'uploads', 'tasks', fileName);
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+    }
+
+    res.json({ message: 'Voice note deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting voice note:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// @route   GET /api/tasks/:id/test-delete
+// @desc    Test delete authentication and task access
+// @access  Private
+router.get('/:id/test-delete', auth, async (req, res) => {
+  try {
+    const task = await Task.findById(req.params.id);
+    if (!task) {
+      return res.status(404).json({ message: 'Task not found' });
+    }
+
+    res.json({ 
+      message: 'Delete access test successful',
+      taskId: task._id,
+      attachmentCount: task.attachments?.length || 0,
+      voiceNoteCount: task.voiceNotes?.length || 0,
+      attachments: task.attachments?.map(a => ({ id: a._id, name: a.originalName || a.name })) || [],
+      voiceNotes: task.voiceNotes?.map(v => ({ id: v._id, url: v.url })) || []
+    });
+  } catch (error) {
+    console.error('Error in test delete:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 });
 
