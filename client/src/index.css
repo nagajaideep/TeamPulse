@@ -2,19 +2,203 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Role-based dashboard theme with distinct visual identities for each user type */
+:root {
+  /* Student theme colors - Blue/Teal palette for focus and learning */
+  --student-primary: #3b82f6;
+  --student-primary-hover: #2563eb;
+  --student-secondary: #06b6d4;
+  --student-accent: #0ea5e9;
+  --student-bg: #f0f9ff;
+  --student-card: #ffffff;
+  --student-border: #e0f2fe;
+  
+  /* Mentor theme colors - Green/Emerald palette for growth and guidance */
+  --mentor-primary: #10b981;
+  --mentor-primary-hover: #059669;
+  --mentor-secondary: #34d399;
+  --mentor-accent: #6ee7b7;
+  --mentor-bg: #f0fdf4;
+  --mentor-card: #ffffff;
+  --mentor-border: #dcfce7;
+  
+  /* Coach theme colors - Purple/Indigo palette for leadership and authority */
+  --coach-primary: #8b5cf6;
+  --coach-primary-hover: #7c3aed;
+  --coach-secondary: #a78bfa;
+  --coach-accent: #c4b5fd;
+  --coach-bg: #faf5ff;
+  --coach-card: #ffffff;
+  --coach-border: #f3e8ff;
+  
+  /* Common theme tokens */
+  --text-primary: #1f2937;
+  --text-secondary: #6b7280;
+  --text-muted: #9ca3af;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --error: #ef4444;
+  --info: #3b82f6;
+  
+  /* Typography */
+  --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  
+  /* Spacing and sizing */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+  
+  /* Border radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: var(--font-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+  font-family: var(--font-mono);
 }
+
+/* Role-based theme classes */
+.theme-student {
+  --primary: var(--student-primary);
+  --primary-hover: var(--student-primary-hover);
+  --secondary: var(--student-secondary);
+  --accent: var(--student-accent);
+  --bg: var(--student-bg);
+  --card: var(--student-card);
+  --border: var(--student-border);
+}
+
+.theme-mentor {
+  --primary: var(--mentor-primary);
+  --primary-hover: var(--mentor-primary-hover);
+  --secondary: var(--mentor-secondary);
+  --accent: var(--mentor-accent);
+  --bg: var(--mentor-bg);
+  --card: var(--mentor-card);
+  --border: var(--mentor-border);
+}
+
+.theme-coach {
+  --primary: var(--coach-primary);
+  --primary-hover: var(--coach-primary-hover);
+  --secondary: var(--coach-secondary);
+  --accent: var(--coach-accent);
+  --bg: var(--coach-bg);
+  --card: var(--coach-card);
+  --border: var(--coach-border);
+}
+
+/* Common component styles */
+.dashboard-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease-in-out;
+}
+
+.dashboard-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-primary:hover {
+  background: var(--primary-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.role-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.role-badge.student {
+  background: var(--student-bg);
+  color: var(--student-primary);
+  border: 1px solid var(--student-border);
+}
+
+.role-badge.mentor {
+  background: var(--mentor-bg);
+  color: var(--mentor-primary);
+  border: 1px solid var(--mentor-border);
+}
+
+.role-badge.coach {
+  background: var(--coach-bg);
+  color: var(--coach-primary);
+  border: 1px solid var(--coach-border);
+}
+
+/* Navigation styles */
+.nav-item {
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: all 0.2s ease-in-out;
+}
+
+.nav-item:hover {
+  background: var(--bg);
+  color: var(--primary);
+}
+
+.nav-item.active {
+  background: var(--bg);
+  color: var(--primary);
+  font-weight: 500;
+}
+
+/* Task status indicators */
+.status-todo { background: #f3f4f6; color: #374151; }
+.status-progress { background: #dbeafe; color: #1d4ed8; }
+.status-review { background: #fef3c7; color: #d97706; }
+.status-done { background: #d1fae5; color: #065f46; }
+
+/* Priority indicators */
+.priority-low { background: #d1fae5; color: #065f46; }
+.priority-medium { background: #fef3c7; color: #d97706; }
+.priority-high { background: #fed7aa; color: #c2410c; }
+.priority-critical { background: #fecaca; color: #dc2626; }
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {

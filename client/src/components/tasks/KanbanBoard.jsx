@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { useSocket } from '../../contexts/SocketContext';
-import { useAuth } from '../../contexts/AuthContext';
 import { toast } from 'react-hot-toast';
 import { 
   Plus, 
@@ -24,8 +23,8 @@ const KanbanBoard = () => {
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [users, setUsers] = useState([]);
-  const { socket, on, off } = useSocket();
-  const { user } = useAuth();
+  const { on, off } = useSocket();
+  
 
   const columns = [
     { id: 'To Do', title: 'To Do', color: 'bg-gray-100' },
@@ -131,14 +130,6 @@ const KanbanBoard = () => {
     }
   };
 
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case 'Done': return <CheckCircle className="h-4 w-4 text-green-600" />;
-      case 'In Progress': return <Clock className="h-4 w-4 text-blue-600" />;
-      case 'Review': return <AlertCircle className="h-4 w-4 text-yellow-600" />;
-      default: return <Circle className="h-4 w-4 text-gray-400" />;
-    }
-  };
 
   const formatDate = (dateString) => {
     if (!dateString) return null;

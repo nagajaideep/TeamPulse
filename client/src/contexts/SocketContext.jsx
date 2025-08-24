@@ -7,7 +7,14 @@ const SocketContext = createContext();
 export const useSocket = () => {
   const context = useContext(SocketContext);
   if (!context) {
-    throw new Error('useSocket must be used within a SocketProvider');
+    // Return safe defaults so callers can destructure without throwing in previews
+    return {
+      socket: null,
+      connected: false,
+      emit: () => {},
+      on: () => {},
+      off: () => {}
+    };
   }
   return context;
 };
@@ -15,7 +22,15 @@ export const useSocket = () => {
 export const SocketProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
   const [connected, setConnected] = useState(false);
-  const { isAuthenticated } = useAuth();
+
+  // Guard useAuth in case AuthProvider isn't mounted yet
+  let isAuthenticated = false;
+  try {
+    const auth = useAuth();
+    isAuthenticated = !!auth?.isAuthenticated;
+  } catch (err) {
+    isAuthenticated = false;
+  }
 
   useEffect(() => {
     if (isAuthenticated) {

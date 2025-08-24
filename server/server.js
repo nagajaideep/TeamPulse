@@ -1,17 +1,24 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
-const http = require('http');
-const socketIo = require('socket.io');
-const path = require('path');
-require('dotenv').config({ path: path.join(__dirname, '.env') });
+import express from 'express';
+import mongoose from 'mongoose';
+import cors from 'cors';
+import http from 'http';
+import { Server as SocketIO } from 'socket.io';
+import path from 'path';
+import dotenv from 'dotenv';
+import process from 'process';
+/* eslint-env node */
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+dotenv.config({ path: path.join(__dirname, '.env') });
 console.log("JWT Secret:", process.env.JWT_SECRET);
 console.log("Current working directory:", process.cwd());
 console.log("__dirname:", __dirname);
 
 const app = express();
 const server = http.createServer(app);
-const io = socketIo(server, {
+const io = new SocketIO(server, {
   cors: {
     origin: process.env.CLIENT_URL || "http://localhost:3000",
     methods: ["GET", "POST"]
@@ -49,11 +56,17 @@ io.on('connection', (socket) => {
 app.set('io', io);
 
 // Routes
-app.use('/api/auth', require('./routes/auth'));
-app.use('/api/tasks', require('./routes/tasks'));
-app.use('/api/meetings', require('./routes/meetings'));
-app.use('/api/feedback', require('./routes/feedback'));
-app.use('/api/reports', require('./routes/reports'));
+import authRoutes from './routes/auth.js';
+import tasksRoutes from './routes/tasks.js';
+import meetingsRoutes from './routes/meetings.js';
+import feedbackRoutes from './routes/feedback.js';
+import reportsRoutes from './routes/reports.js';
+
+app.use('/api/auth', authRoutes);
+app.use('/api/tasks', tasksRoutes);
+app.use('/api/meetings', meetingsRoutes);
+app.use('/api/feedback', feedbackRoutes);
+app.use('/api/reports', reportsRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

@@ -1,19 +1,48 @@
 {
-  "name": "teampulse",
-  "version": "1.0.0",
-  "description": "Collaborative workspace for student-mentor project management",
-  "main": "index.js",
+  "name": "781c0e5c5f9ce56177183d51dba1e94145c17f4046d47bbaf9b13f60424427ee",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
   "scripts": {
-    "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "server": "cd server && npm run dev",
-    "client": "cd client && npm start",
-    "install-all": "npm install && cd server && npm install && cd ../client && npm install",
-    "seed": "cd server && npm run seed"
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
   },
-  "keywords": ["mern", "collaboration", "project-management", "real-time"],
-  "author": "TeamPulse",
-  "license": "MIT",
   "devDependencies": {
+    "@eslint/js": "^9.21.0",
+    "@types/node": "^24.3.0",
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
+    "@vitejs/plugin-react": "^4.7.0",
+    "comment-json": "^4.2.5",
+    "env-cmd": "^11.0.0",
+    "eslint": "^9.21.0",
+    "eslint-plugin-react-hooks": "^5.1.0",
+    "eslint-plugin-react-refresh": "^0.4.19",
+    "globals": "^15.15.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "rollup": "^4.44.1",
+    "vite": "^6.2.0",
+    "vite-plugin-static-copy": "^3.1.2"
+  },
+  "dependencies": {
+    "@kombai/react-error-boundary": "^1.1.0",
+    "date-fns": "^4.1.0",
+    "lucide-react": "^0.541.0",
+    "postcss": "^8.5.6",
+    "postcss-import": "^16.1.1",
+    "postcss-preset-env": "^10.3.0",
+    "tailwindcss": "^3.4.17",
+    "react-router-dom": "latest",
+    "recharts": "latest",
+    "react-hot-toast": "latest",
+    "mongoose": "latest",
+    "express": "latest",
+    "express-validator": "latest"
+  },
+  "strictDependencies": {
     "concurrently": "^8.2.2"
   }
 }

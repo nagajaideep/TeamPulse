@@ -1,10 +1,10 @@
-const express = require('express');
-const Task = require('../models/Task');
-const Meeting = require('../models/Meeting');
-const Feedback = require('../models/Feedback');
-const User = require('../models/User');
-const auth = require('../middleware/auth');
-const moment = require('moment');
+import express from 'express';
+import Task from '../models/Task.js';
+import Meeting from '../models/Meeting.js';
+import Feedback from '../models/Feedback.js';
+import User from '../models/User.js';
+import auth from '../middleware/auth.js';
+import moment from 'moment';
 
 const router = express.Router();
 
@@ -157,4 +157,4 @@ router.get('/users', auth, async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

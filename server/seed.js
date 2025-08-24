@@ -1,12 +1,12 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
-require('dotenv').config();
-
-// Import models
-const User = require('./models/User');
-const Task = require('./models/Task');
-const Meeting = require('./models/Meeting');
-const Feedback = require('./models/Feedback');
+import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+import process from 'process';
+import User from './models/User.js';
+import Task from './models/Task.js';
+import Meeting from './models/Meeting.js';
+import Feedback from './models/Feedback.js';
+/* eslint-env node */
+dotenv.config();
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/teampulse')
@@ -110,7 +110,7 @@ const seedData = async () => {
     console.log('Created demo tasks');
 
     // Create demo meeting
-    const meeting = await Meeting.create({
+   /* const meeting = await Meeting.create({
       title: 'Weekly Progress Review',
       description: 'Review progress on current tasks and plan next week',
       datetime: new Date(Date.now() + 24 * 60 * 60 * 1000), // Tomorrow
@@ -118,7 +118,7 @@ const seedData = async () => {
       attendees: [mentor._id, student1._id, student2._id],
       createdBy: mentor._id
     });
-
+*/
     console.log('Created demo meeting');
 
     // Create demo feedback

@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const feedbackSchema = new mongoose.Schema({
   fromUser: {
@@ -44,4 +44,4 @@ feedbackSchema.pre('save', function(next) {
   next();
 });
 
-module.exports = mongoose.model('Feedback', feedbackSchema);
+export default mongoose.model('Feedback', feedbackSchema);

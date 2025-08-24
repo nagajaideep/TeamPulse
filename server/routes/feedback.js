@@ -1,9 +1,9 @@
-const express = require('express');
-const { body, validationResult } = require('express-validator');
-const Feedback = require('../models/Feedback');
-const User = require('../models/User');
-const Task = require('../models/Task');
-const auth = require('../middleware/auth');
+import express from 'express';
+import { body, validationResult } from 'express-validator';
+import Feedback from '../models/Feedback.js';
+import User from '../models/User.js';
+import Task from '../models/Task.js';
+import auth from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -120,4 +120,4 @@ router.get('/:id', auth, async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

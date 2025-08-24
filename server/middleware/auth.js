@@ -1,5 +1,7 @@
-const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+/* eslint-env node */
+import process from 'process';
+import jwt from 'jsonwebtoken';
+import User from '../models/User.js';
 
 const auth = async (req, res, next) => {
   try {
@@ -19,8 +21,9 @@ const auth = async (req, res, next) => {
     req.user = user;
     next();
   } catch (error) {
+    console.error('Auth middleware error:', error);
     res.status(401).json({ message: 'Token is not valid' });
   }
 };
 
-module.exports = auth;
+export default auth;

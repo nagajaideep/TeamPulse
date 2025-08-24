@@ -1,6 +1,7 @@
 {
   "name": "teampulse-server",
   "version": "1.0.0",
+  "type": "module",
   "description": "TeamPulse backend server",
   "main": "server.js",
   "scripts": {
