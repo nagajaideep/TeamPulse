@@ -19,7 +19,7 @@ export const SocketProvider = ({ children }) => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      const newSocket = io('http://localhost:5001', {
+      const newSocket = io('http://localhost:5000', {
         transports: ['websocket', 'polling']
       });
 
